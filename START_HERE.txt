@@ -1,0 +1,15 @@
+METAVERSE SQUADFINDER — SUPABASE FREE CLOUD EDITION
+
+1. Open DEPLOY_SUPABASE_FREE.html for the visual instructions.
+2. Create a free Supabase project and copy its Session pooler database URL.
+3. Run PREPARE_SUPABASE_WINDOWS.bat.
+4. Let the wizard import your installed SquadFinder database if desired.
+5. Upload this folder to a private GitHub repository.
+6. In Render, create a New Blueprint from the repository.
+7. Enter the requested SUPABASE_DB_URL and administrator values.
+
+IMPORTANT
+- Supabase stores the data.
+- Render runs the Flask website because Supabase does not host arbitrary Flask servers.
+- The public Render URL has trusted HTTPS.
+- Fake demo users, fake rooms, and fictional sample maps are disabled by default.

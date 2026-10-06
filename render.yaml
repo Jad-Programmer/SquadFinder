@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: metaverse-squadfinder
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 120 --access-logfile -
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: SQUADFINDER_CLOUD
+        value: "1"
+      - key: SQUADFINDER_SEED_DEMO
+        value: "0"
+      - key: SQUADFINDER_SEED_CATALOG
+        value: "0"
+      - key: SQUADFINDER_HSTS
+        value: "1"
+      - key: SQUADFINDER_SECRET_KEY
+        generateValue: true
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: SQUADFINDER_ADMIN_USERNAME
+        sync: false
+      - key: SQUADFINDER_ADMIN_EMAIL
+        sync: false
+      - key: SQUADFINDER_ADMIN_PASSWORD
+        sync: false

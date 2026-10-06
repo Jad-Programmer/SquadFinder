@@ -1,0 +1,19 @@
+METAVERSE SQUADFINDER - SIMPLIFIED NAVIGATION UPDATE
+=====================================================
+
+What changed
+------------
+- Removed the narrow circular icon/server rail from the far-left side.
+- Kept the full channel-style sidebar as the main desktop navigation.
+- Made the sidebar search box functional for map names and real map codes.
+- Added quick links in the top bar for Maps, Squads, Quick Match, and Add Map.
+- Added a phone bottom navigation bar for Home, Maps, Squads, Add Map, and Profile/Sign in.
+- All existing routes and features remain available.
+
+Existing data
+-------------
+This package contains no database. Preserve your existing:
+
+    instance/squadfinder.db
+
+Copy the old instance folder into this new metaverse_squadfinder folder before starting it.

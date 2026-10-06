@@ -1,0 +1,13 @@
+MetaVerse SquadFinder Community Feature Pack 1.1
+
+Added:
+- Friend requests, accepting, declining, cancelling, and removing friends
+- Public player profiles and friend activity feed
+- Notification inbox and unread badge
+- Map star ratings and optional written reviews
+- Scheduled gaming events with map, date/time, region, language, microphone preference, capacity, join/leave, and cancellation
+- Event listings on the homepage and map detail pages
+- New profile statistics and personal events tab
+
+Database migration:
+The new tables are created automatically with CREATE TABLE IF NOT EXISTS. Existing squadfinder.db files are preserved.
