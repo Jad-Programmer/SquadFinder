@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Schedule event · MetaVerse SquadFinder{% endblock %}
+{% block content %}
+<section class="form-page shell event-form-page">
+  <div class="form-intro"><span class="kicker-simple">COMMUNITY EVENT</span><h1>Schedule a gaming session</h1><p>Pick a real map, choose a future start time, and let players reserve their spots.</p><div class="form-tip"><strong>Good event titles are specific</strong><p>Example: “Friday beginner raid practice” or “Creator playtest and feedback.”</p></div></div>
+  <form class="app-form" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="field-grid">
+    <label class="span-2">Map<select name="map_id" required><option value="">Choose a map</option>{% for map in maps %}<option value="{{ map['id'] }}" {{ 'selected' if preselected==map['id'] }}>{{ map['platform'] }} · {{ map['name'] }} · {{ map['map_code'] }}</option>{% endfor %}</select></label>
+    <label class="span-2">Event title<input name="title" maxlength="100" placeholder="Friday co-op run" required></label>
+    <label>Start date and time<span class="datetime-shell"><input type="datetime-local" name="starts_at" required></span><small>Uses the local time on the computer running SquadFinder.</small></label>
+    <label>Duration<select name="duration_minutes"><option value="30">30 minutes</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option><option value="180">3 hours</option></select></label>
+    <label>Maximum players<input type="number" name="max_players" value="8" min="2" max="100"></label>
+    <label>Region<select name="region">{% for item in regions %}<option>{{ item }}</option>{% endfor %}</select></label>
+    <label>Language<select name="language">{% for item in languages %}<option>{{ item }}</option>{% endfor %}</select></label>
+    <label>Microphone<select name="mic">{% for item in mic_options %}<option>{{ item }}</option>{% endfor %}</select></label>
+    <label class="span-2">Event notes<textarea name="note" rows="5" maxlength="800" placeholder="Goals, skill level, roles needed, and anything players should know."></textarea></label>
+  </div><div class="form-actions"><button class="button button-primary">Schedule event</button><a class="button button-secondary" href="{{ url_for('events_list') }}">Cancel</a></div></form>
+</section>
+{% endblock %}

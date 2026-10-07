@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Your profile · MetaVerse SquadFinder{% endblock %}
+{% block content %}
+<section class="profile-page shell">
+  <aside class="profile-summary">
+    <span class="avatar profile-avatar">{{ g.user['display_name'][0]|upper }}</span>
+    <h1>{{ g.user['display_name'] }}</h1><p>@{{ g.user['platform_handle'] }}</p>
+    <div class="tag-row centered-tags"><span>{{ g.user['region'] }}</span><span>{{ g.user['language'] }}</span></div>
+    <p class="bio">{{ g.user['bio'] or 'Add a short bio so squad hosts know your play style.' }}</p>
+    <div class="profile-mini-stats"><a href="{{ url_for('community') }}"><strong>{{ friend_count }}</strong><span>Friends</span></a><div><strong>{{ review_count }}</strong><span>Reviews</span></div><div><strong>{{ my_events|length }}</strong><span>Events</span></div></div>
+    <a class="button button-secondary full" href="{{ url_for('community') }}">Open friends & activity</a>
+    {% if g.user['is_creator'] or g.user['is_admin'] %}<a class="button button-secondary full" href="{{ url_for('creator_dashboard') }}">Open creator console</a>{% endif %}
+  </aside>
+  <div class="profile-content">
+    <div class="tabs"><button class="active" data-tab="settings">Profile settings</button><button data-tab="following">Followed maps ({{ followed|length }})</button><button data-tab="rooms">My rooms</button><button data-tab="events">My events ({{ my_events|length }})</button></div>
+    <section class="tab-panel active" id="settings"><form class="app-form simple-form" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="field-grid"><label>Display name<input name="display_name" value="{{ g.user['display_name'] }}" required></label><label>Platform handle<input name="platform_handle" value="{{ g.user['platform_handle'] }}" placeholder="Username players should add"></label><label>Region<select name="region">{% for item in regions %}<option {{ 'selected' if g.user['region']==item }}>{{ item }}</option>{% endfor %}</select></label><label>Language<select name="language">{% for item in languages %}<option {{ 'selected' if g.user['language']==item }}>{{ item }}</option>{% endfor %}</select></label><label class="span-2">Bio<textarea name="bio" rows="4" maxlength="240">{{ g.user['bio'] }}</textarea></label></div><button class="button button-primary">Save profile</button></form></section>
+    <section class="tab-panel" id="following"><div class="mini-map-list">{% for map in followed %}<a href="{{ url_for('map_detail', map_id=map['id']) }}"><span class="platform-mini"><img src="{{ url_for('static', filename='img/platform_logos/' ~ platform_slug(map['platform']) ~ '.svg') }}" alt=""></span><div><strong>{{ map['name'] }}</strong><small>{{ map['platform'] }} · {{ map['map_code'] }}</small></div><span>→</span></a>{% else %}<div class="empty-state">You are not following any maps yet.</div>{% endfor %}</div></section>
+    <section class="tab-panel" id="rooms"><div class="table-wrap"><table><thead><tr><th>Room</th><th>Map</th><th>Status</th><th>Players</th><th></th></tr></thead><tbody>{% for room in my_rooms %}<tr><td>{{ room['title'] }}</td><td>{{ room['map_name'] }}</td><td><span class="status-label status-{{ room['status'] }}">{{ room['status'] }}</span></td><td>{{ room['current_members'] }}/{{ room['party_size'] }}</td><td><a href="{{ url_for('room_detail', room_id=room['id']) }}">Open</a></td></tr>{% else %}<tr><td colspan="5">You have not created a room yet.</td></tr>{% endfor %}</tbody></table></div></section>
+    <section class="tab-panel" id="events"><div class="mini-event-list">{% for event in my_events %}<a href="{{ url_for('event_detail', event_id=event['id']) }}"><span class="mini-event-time">{{ event['starts_at']|eventtime }}</span><div><strong>{{ event['title'] }}</strong><small>{{ event['map_name'] }} · {{ event['attendee_count'] }}/{{ event['max_players'] }} joined{% if event['host_id']==g.user['id'] %} · Hosting{% endif %}</small></div><span>→</span></a>{% else %}<div class="empty-state">You have no upcoming events.</div>{% endfor %}</div></section>
+  </div>
+</section>
+{% endblock %}
