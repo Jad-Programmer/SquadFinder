@@ -1,5 +1,0 @@
-{% extends 'base.html' %}
-{% block title %}Sign in · MetaVerse SquadFinder{% endblock %}
-{% block content %}
-<section class="auth-page shell"><div class="auth-art"><span class="kicker-simple">WELCOME BACK</span><h1>Your next squad is already forming.</h1><p>Sign in to join rooms, publish LFG posts, follow maps, and build your player reputation.</p><div class="demo-box"><strong>Demo player</strong><code>demo</code><code>demo123</code><strong>Creator demo</strong><code>creator</code><code>creator123</code></div></div><form class="auth-card" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><h2>Sign in</h2><label>Email or username<input name="identity" autocomplete="username" required></label><label>Password<input type="password" name="password" autocomplete="current-password" required></label><button class="button button-primary full">Sign in</button><p>New here? <a href="{{ url_for('register') }}">Create a free account</a></p></form></section>
-{% endblock %}
