@@ -1,97 +1,173 @@
-# MetaVerse SquadFinder — Supabase Free Cloud Edition
+# MetaVerse SquadFinder
 
-This package moves SquadFinder's persistent data from local SQLite to a Supabase
-Postgres project. Supabase provides the database; the included `render.yaml`
-hosts the Python/Flask web process on Render's free web-service tier.
+SquadFinder is a Flask application for finding players, creating squads, discovering maps, chatting with room members, following creators, joining events, and using browser-based WebRTC voice chat.
 
-## Why two services?
+This repository contains the **source code**. Anyone who downloads or clones it can connect it to **their own Supabase project** and run their own copy of SquadFinder.
 
-Supabase provides Postgres, Auth, Realtime, Storage, and Edge Functions, but it
-does not run an arbitrary long-lived Python Flask server. The current SquadFinder
-is a Flask application, so a small Python host is still required. This package
-uses:
+## What you need
 
-- **Supabase Free:** permanent Postgres data for users, maps, squads, messages,
-  friends, reviews, events, notifications, and WebRTC signaling.
-- **Render Free:** runs the Flask website at a public trusted-HTTPS URL.
+Before running SquadFinder, install:
 
-## 1. Create the Supabase project
+- **Python 3.13**
+- A free **Supabase** account
+- Git is optional. You can also download the repository as a ZIP from GitHub.
 
-1. Create a free Supabase project.
-2. Wait until the database is ready.
-3. Open **Connect** and select the **Session pooler** connection string.
-4. Replace the password placeholder with the database password you chose.
-5. Keep this connection string secret. Do not paste the Supabase service-role key
-   into browser JavaScript.
+## 1. Download SquadFinder
 
-The Session pooler is recommended for free hosting and IPv4-compatible app hosts.
-
-## 2. Prepare and optionally migrate your current app
-
-On Windows, double-click `PREPARE_SUPABASE_WINDOWS.bat`.
-
-Use a new, empty Supabase project for the first migration.
-
-The wizard will:
-
-- test the encrypted Supabase connection;
-- save local secrets in `.env` (excluded from Git);
-- optionally import `instance/squadfinder.db` while preserving IDs, real accounts,
-  password hashes, rooms, chat, friends, reviews, and events;
-- optionally remove the bundled fake users, fake rooms, and fictional sample maps.
-
-To run the migration manually:
+Either clone the repository:
 
 ```bash
-python scripts/migrate_sqlite_to_supabase.py --sqlite instance/squadfinder.db --clean-demo
+git clone https://github.com/Jad-Programmer/SquadFinder.git
+cd SquadFinder
 ```
 
-## 3. Publish the Flask app for free
+or use **Code > Download ZIP** on GitHub and extract it.
 
-1. Put this folder in a private GitHub repository. Do not upload `.env` or the
-   `instance` folder.
-2. In Render, choose **New > Blueprint** and select that repository.
-3. Render reads `render.yaml` and creates the free web service.
-4. In the requested environment variables, paste:
-   - `SUPABASE_DB_URL`: your Supabase **Session pooler** connection string;
-   - `SQUADFINDER_ADMIN_USERNAME`;
-   - `SQUADFINDER_ADMIN_EMAIL`;
-   - `SQUADFINDER_ADMIN_PASSWORD`.
-5. Deploy. After the first successful login, remove
-   `SQUADFINDER_ADMIN_PASSWORD` from Render so it is not retained unnecessarily.
+## 2. Create your own Supabase project
 
-Render automatically provides trusted HTTPS, so browsers no longer show the
-local self-signed-certificate warning.
+1. Go to Supabase and create a new project.
+2. Choose a database password and keep it safe.
+3. Wait until the project finishes creating the database.
+4. Open the Supabase **SQL Editor**.
+5. Open `schema_postgres.sql` from this repository, copy its contents, paste them into the SQL Editor, and run it.
+6. In Supabase, open **Connect** and choose the **Session pooler** connection string.
+7. Replace the password placeholder in that connection string with your own database password.
 
-## Public launch defaults
+Your connection string will look similar to:
 
-- Fake demo accounts and fake live rooms are disabled.
-- The fictional bundled catalog is disabled.
-- Import your existing database, or let users add real in-game maps through
-  **Add Real Map**.
-- Set `SQUADFINDER_SEED_CATALOG=1` only for a clearly-labelled test site.
+```text
+postgresql://postgres.PROJECT_REF:YOUR_PASSWORD@aws-0-REGION.pooler.supabase.com:5432/postgres?sslmode=require
+```
 
-## Voice chat
+Keep this URL private. **Never post your real Supabase database password or connection string on GitHub.**
 
-HTTPS and browser microphone access work on the public Render URL. WebRTC uses
-public STUN servers. Some users on restrictive mobile or corporate networks will
-need a TURN server; configure the optional TURN environment variables shown in
-`.env.example`.
+## 3. Create your `.env` file
 
-## Free-plan behavior
+In the SquadFinder folder, make a copy of `.env.example` and name it:
 
-Free hosting is suitable for an MVP. Render may spin the web process down during
-inactivity, so the first visit after a quiet period can take longer. Supabase free
-projects have usage limits and may be paused according to the current free-plan
-policies. Upgrade only when real traffic requires it.
+```text
+.env
+```
 
-## Local test using Supabase
+Then edit `.env` and replace the placeholders with your own information.
 
-After the wizard creates `.env`:
+The most important setting is:
+
+```env
+SUPABASE_DB_URL=YOUR_SUPABASE_SESSION_POOLER_URL
+```
+
+You can also set your first administrator account:
+
+```env
+SQUADFINDER_ADMIN_USERNAME=admin
+SQUADFINDER_ADMIN_EMAIL=you@example.com
+SQUADFINDER_ADMIN_PASSWORD=choose-a-strong-password
+```
+
+`SQUADFINDER_SECRET_KEY` should be a long random value. Do not share it publicly.
+
+The `.env` file is already ignored by Git, so your private values should not be committed to the repository.
+
+## 4. Install the Python packages
+
+Open Command Prompt, PowerShell, or a terminal inside the SquadFinder folder and run:
 
 ```bash
 python -m pip install -r requirements.txt
-python -c "from dotenv import load_dotenv; load_dotenv(); import app; app.app.run(port=5000)"
 ```
 
-Open `http://127.0.0.1:5000` for a local test. The published Render URL uses HTTPS.
+## 5. Run SquadFinder
+
+Run:
+
+```bash
+python -c "from app import app; app.run(host='127.0.0.1', port=5000)"
+```
+
+Then open:
+
+```text
+http://127.0.0.1:5000
+```
+
+You should now see SquadFinder running with your own Supabase database.
+
+## First launch
+
+On the first launch, SquadFinder creates any required application data and uses the Supabase connection from your `.env` file.
+
+If you configured the optional administrator variables, use that administrator account to sign in.
+
+For security, after confirming that the administrator account was created successfully, you can remove `SQUADFINDER_ADMIN_PASSWORD` from your `.env` file.
+
+## Run without Supabase
+
+SquadFinder can also use a local SQLite database when no Supabase/Postgres database URL is configured. This is useful for local development or testing.
+
+The local database is stored inside:
+
+```text
+instance/squadfinder.db
+```
+
+For a shared or online installation, Supabase/Postgres is recommended instead of SQLite.
+
+## Put your own copy online
+
+If you want other people to access your SquadFinder installation over the internet, you need a Python host in addition to Supabase.
+
+This repository includes `render.yaml` for deployment on Render.
+
+A typical setup is:
+
+- **GitHub** — stores your SquadFinder source code
+- **Supabase** — stores users, maps, squads, messages, friends, reviews, events, notifications, and other persistent data
+- **Render** — runs the Flask application and gives it a public HTTPS address
+
+When deploying, add your private environment variables directly in the hosting provider. Do **not** put your real `.env` file in GitHub.
+
+## Voice chat
+
+SquadFinder includes browser-based WebRTC voice chat.
+
+For public internet deployments, HTTPS is required for normal microphone access. Public STUN servers work for many users, but users behind restrictive networks may require a TURN server. Optional TURN settings are listed in `.env.example`.
+
+## Important security notes
+
+- Never commit `.env`.
+- Never publish your Supabase database password.
+- Never publish your full `SUPABASE_DB_URL`.
+- Do not put Supabase service-role keys in browser JavaScript.
+- Use a strong administrator password.
+- Use HTTPS when exposing SquadFinder publicly.
+
+## Main project files
+
+```text
+app.py                  Main Flask application
+catalog.py              Supported game/platform catalog
+schema_postgres.sql     Supabase/Postgres database schema
+requirements.txt        Python dependencies
+.env.example            Safe configuration example
+render.yaml             Optional Render deployment configuration
+wsgi.py                 Production WSGI entry point
+templates/              HTML pages
+static/                 CSS, JavaScript, and platform logos
+```
+
+## Quick start summary
+
+```text
+1. Download SquadFinder
+2. Create a Supabase project
+3. Run schema_postgres.sql in Supabase SQL Editor
+4. Copy the Session pooler database URL
+5. Copy .env.example to .env
+6. Put your own Supabase URL in .env
+7. Run: python -m pip install -r requirements.txt
+8. Run SquadFinder
+9. Open http://127.0.0.1:5000
+```
+
+Each person who uses this source code should create and use **their own Supabase project and private credentials**.
