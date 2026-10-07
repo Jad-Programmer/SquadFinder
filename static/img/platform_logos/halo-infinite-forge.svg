@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="900" y2="300" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0e1f2f"/>
+      <stop offset="1" stop-color="#4ba3d5"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="300" rx="28" fill="url(#g)"/>
+  <rect x="34" y="36" width="120" height="120" rx="28" fill="#ffffff" fill-opacity="0.10" stroke="#ffffff" stroke-opacity="0.18"/>
+  <path d="M84 91h20v20H84z" fill="#ffffff" fill-opacity="0.90"/>
+  <path d="M84 111h20v20H84z" fill="#ffffff" fill-opacity="0.42"/>
+  <path d="M104 91h20v20h-20z" fill="#ffffff" fill-opacity="0.42"/>
+  <path d="M104 111h20v20h-20z" fill="#ffffff" fill-opacity="0.90"/>
+  <circle cx="718" cy="78" r="138" fill="#ffffff" fill-opacity="0.10"/>
+  <circle cx="804" cy="262" r="108" fill="#ffffff" fill-opacity="0.06"/>
+  <path d="M0 236C118 186 229 169 332 186c86 14 154 46 240 48 109 2 198-30 328-84v150H0z" fill="#000000" fill-opacity="0.18"/>
+  <text x="195" y="130" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="900" letter-spacing="-1.5" fill="#ffffff">HALO</text>
+  <text x="198" y="173" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="4" fill="#d2f4ff">INFINITE FORGE</text>
+  <text x="198" y="218" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="2" fill="#ffffff" fill-opacity="0.85">LFG · LIVE ROOMS · GUIDES</text>
+</svg>
