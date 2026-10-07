@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#313338">
+  <title>{% block title %}MetaVerse SquadFinder{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/discord-theme.css') }}">
+</head>
+<body class="discord-theme">
+  <div class="discord-app">
+    <aside class="channel-sidebar" data-nav>
+      <div class="workspace-title">
+        <a href="{{ url_for('home') }}"><strong>MetaVerse SquadFinder</strong><small>UGC LFG COMMUNITY</small></a>
+        <button class="sidebar-close" type="button" aria-label="Close navigation" data-nav-toggle>×</button>
+      </div>
+
+      <div class="sidebar-scroll">
+        <form class="sidebar-search" action="{{ url_for('maps_list') }}" method="get">
+          <span aria-hidden="true">⌕</span>
+          <label class="sr-only" for="sidebar-map-search">Find a map or code</label>
+          <input id="sidebar-map-search" name="q" placeholder="Find a map or code · Ctrl K" autocomplete="off">
+          <button type="submit" aria-label="Search maps">↵</button>
+        </form>
+
+        <nav class="channel-nav">
+          <p class="channel-group-title">DISCOVER</p>
+          <a class="{{ 'active' if request.endpoint == 'home' else '' }}" href="{{ url_for('home') }}"><span class="channel-icon">⌂</span><span>Home</span></a>
+          <a class="{{ 'active' if request.endpoint in ['maps_list','map_detail'] else '' }}" href="{{ url_for('maps_list') }}"><span class="channel-icon">#</span><span>map-discovery</span></a>
+          <a class="{{ 'active' if request.endpoint in ['rooms_list','room_detail'] else '' }}" href="{{ url_for('rooms_list') }}"><span class="channel-icon">#</span><span>live-squads</span><i class="sidebar-live-dot"></i></a>
+          <a class="{{ 'active' if request.endpoint == 'quick_match' else '' }}" href="{{ url_for('quick_match') }}"><span class="channel-icon">#</span><span>quick-match</span></a>
+          <a class="{{ 'active' if request.endpoint in ['events_list','event_detail'] else '' }}" href="{{ url_for('events_list') }}"><span class="channel-icon">◷</span><span>scheduled-events</span></a>
+
+          <p class="channel-group-title">CREATE</p>
+          <a class="{{ 'active' if request.endpoint == 'creator_new_map' else '' }}" href="{{ url_for('creator_new_map') }}"><span class="channel-icon">＋</span><span>Add real game map</span></a>
+          <a class="{{ 'active' if request.endpoint == 'create_room' else '' }}" href="{{ url_for('create_room') }}"><span class="channel-icon">⚡</span><span>Create squad room</span></a>
+          {% if g.user and (g.user['is_creator'] or g.user['is_admin']) %}
+          <a class="{{ 'active' if request.endpoint and request.endpoint.startswith('creator') else '' }}" href="{{ url_for('creator_dashboard') }}"><span class="channel-icon">◆</span><span>Creator console</span></a>
+          {% endif %}
+
+          <p class="channel-group-title">COMMUNITY</p>
+          {% if g.user %}
+          <a class="{{ 'active' if request.endpoint in ['community','public_profile'] else '' }}" href="{{ url_for('community') }}"><span class="channel-icon">♟</span><span>friends-and-feed</span></a>
+          <a class="{{ 'active' if request.endpoint in ['notifications','open_notification'] else '' }}" href="{{ url_for('notifications') }}"><span class="channel-icon">●</span><span>notifications</span>{% if g.unread_notifications %}<i class="nav-count">{{ g.unread_notifications if g.unread_notifications < 100 else '99+' }}</i>{% endif %}</a>
+          {% endif %}
+          {% if request.endpoint == 'room_detail' and room is defined %}
+          <a class="voice-channel" href="#voice-channel"><span class="channel-icon">◖</span><div><strong>Squad voice channel</strong><small>{{ room['current_members'] }} squad members</small></div></a>
+          <a class="voice-channel" href="#text-chat"><span class="channel-icon">#</span><div><strong>squad-chat</strong><small>Private room messages</small></div></a>
+          {% else %}
+          <div class="voice-channel"><span class="channel-icon">◖</span><div><strong>Squad communications</strong><small>Open a squad room to connect</small></div></div>
+          {% endif %}
+          <div class="community-status"><span class="status-avatar">SF</span><div><strong>SquadFinder</strong><small><i></i> Community online</small></div></div>
+        </nav>
+      </div>
+
+      <div class="sidebar-user-panel">
+        {% if g.user %}
+          <a class="sidebar-user" href="{{ url_for('profile') }}"><span class="avatar">{{ g.user['display_name'][0]|upper }}</span><span><strong>{{ g.user['display_name'] }}</strong><small>@{{ g.user['username'] }}</small></span></a>
+          <div class="sidebar-user-actions"><a href="{{ url_for('profile') }}" aria-label="Profile settings">⚙</a><a href="{{ url_for('logout') }}" aria-label="Log out">↪</a></div>
+        {% else %}
+          <div class="guest-panel"><span class="status-avatar">?</span><div><strong>Guest player</strong><small>Sign in to join squads</small></div></div>
+          <a class="sidebar-signin" href="{{ url_for('login') }}">Sign in</a>
+        {% endif %}
+      </div>
+    </aside>
+
+    <section class="discord-content">
+      <header class="content-header">
+        <button class="nav-toggle" type="button" aria-label="Open navigation" data-nav-toggle>☰</button>
+        <div class="content-channel-title"><span>#</span><strong>{{ 'notifications' if request.endpoint in ['notifications','open_notification'] else 'friends-and-feed' if request.endpoint in ['community','public_profile'] else 'scheduled-events' if request.endpoint in ['events_list','event_detail','create_event'] else 'live-squads' if request.endpoint in ['rooms_list','room_detail'] else 'add-real-map' if request.endpoint == 'creator_new_map' else 'map-discovery' if request.endpoint in ['maps_list','map_detail'] else 'quick-match' if request.endpoint == 'quick_match' else 'squadfinder-home' }}</strong></div>
+        <div class="content-header-divider"></div>
+        <p>Find players for the UGC maps you love.</p>
+        <nav class="header-quick-nav" aria-label="Quick navigation">
+          <a class="{{ 'active' if request.endpoint in ['maps_list','map_detail'] else '' }}" href="{{ url_for('maps_list') }}"><span>⌕</span><em>Maps</em></a>
+          <a class="{{ 'active' if request.endpoint in ['rooms_list','room_detail'] else '' }}" href="{{ url_for('rooms_list') }}"><span>⚡</span><em>Squads</em></a>
+          <a class="{{ 'active' if request.endpoint == 'quick_match' else '' }}" href="{{ url_for('quick_match') }}"><span>QM</span><em>Match</em></a>
+          <a class="{{ 'active' if request.endpoint in ['events_list','event_detail','create_event'] else '' }}" href="{{ url_for('events_list') }}"><span>◷</span><em>Events</em></a>
+          <a class="header-add-map {{ 'active' if request.endpoint == 'creator_new_map' else '' }}" href="{{ url_for('creator_new_map') }}"><span>＋</span><em>Add map</em></a>
+        </nav>
+        <div class="header-actions">
+          {% if g.user %}
+            <a class="header-notification-button" href="{{ url_for('notifications') }}" aria-label="Notifications"><span>●</span>{% if g.unread_notifications %}<i>{{ g.unread_notifications if g.unread_notifications < 100 else '99+' }}</i>{% endif %}</a>
+            <a class="header-icon-button" href="{{ url_for('profile') }}" aria-label="Profile">{{ g.user['display_name'][0]|upper }}</a>
+          {% else %}
+            <a class="button button-ghost compact" href="{{ url_for('login') }}">Sign in</a>
+            <a class="button button-primary compact" href="{{ url_for('register') }}">Join free</a>
+          {% endif %}
+        </div>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack" aria-live="polite">
+            {% for category, message in messages %}<div class="flash flash-{{ category }}">{{ message }}<button type="button" aria-label="Dismiss">×</button></div>{% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <main class="content-canvas">{% block content %}{% endblock %}</main>
+
+      <footer class="site-footer">
+        <div><strong>MetaVerse SquadFinder</strong><p>The live multiplayer layer for user-created maps.</p></div>
+        <div class="footer-links"><a href="{{ url_for('maps_list') }}">Maps</a><a href="{{ url_for('rooms_list') }}">Squads</a><a href="{{ url_for('events_list') }}">Events</a>{% if g.user %}<a href="{{ url_for('community') }}">Friends</a>{% else %}<a href="{{ url_for('register') }}">Create account</a>{% endif %}</div>
+        <p class="legal">Independent MVP demo. Not affiliated with Discord or the publishers represented in the demonstration catalog.</p>
+      </footer>
+    </section>
+  </div>
+
+  <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+    <a class="{{ 'active' if request.endpoint == 'home' else '' }}" href="{{ url_for('home') }}"><span>⌂</span><small>Home</small></a>
+    <a class="{{ 'active' if request.endpoint in ['maps_list','map_detail'] else '' }}" href="{{ url_for('maps_list') }}"><span>⌕</span><small>Maps</small></a>
+    <a class="{{ 'active' if request.endpoint in ['rooms_list','room_detail'] else '' }}" href="{{ url_for('rooms_list') }}"><span>⚡</span><small>Squads</small></a>
+    <a class="mobile-add-map {{ 'active' if request.endpoint == 'creator_new_map' else '' }}" href="{{ url_for('creator_new_map') }}"><span>＋</span><small>Add map</small></a>
+    {% if g.user %}
+      <a class="{{ 'active' if request.endpoint == 'profile' else '' }}" href="{{ url_for('profile') }}"><span>{{ g.user['display_name'][0]|upper }}</span><small>Profile</small></a>
+    {% else %}
+      <a class="{{ 'active' if request.endpoint in ['login','register'] else '' }}" href="{{ url_for('login') }}"><span>↪</span><small>Sign in</small></a>
+    {% endif %}
+  </nav>
+  <div class="mobile-sidebar-backdrop" data-sidebar-backdrop></div>
+
+  <script>window.SQUADFINDER_CSRF = {{ csrf_token()|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

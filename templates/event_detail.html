@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{{ event['title'] }} · MetaVerse SquadFinder{% endblock %}
+{% block content %}
+<section class="event-detail-page shell">
+  <div class="event-detail-hero">
+    <div class="event-detail-logo"><img src="{{ url_for('static', filename='img/platform_logos/' ~ platform_slug(event['platform']) ~ '.svg') }}" alt="{{ event['platform'] }} logo"></div>
+    <div class="event-detail-copy"><span class="kicker-simple">SCHEDULED EVENT · {{ event['platform'] }}</span><h1>{{ event['title'] }}</h1><p>{{ event['note'] or 'A community gaming session for this map.' }}</p><div class="event-big-time"><span>◷</span><div><small>STARTS</small><strong>{{ event['starts_at']|eventtime }}</strong></div></div><div class="tag-row large-tags"><span>{{ event['duration_minutes'] }} minutes</span><span>{{ event['region'] }}</span><span>{{ event['language'] }}</span><span>Mic: {{ event['mic'] }}</span></div></div>
+    <div class="event-detail-actions">
+      {% if not g.user %}<a class="button button-primary" href="{{ url_for('login', next=request.path) }}">Sign in to join</a>
+      {% elif event['status'] != 'scheduled' %}<button class="button button-secondary" disabled>{{ event['status']|title }}</button>
+      {% elif event['host_id'] == g.user['id'] or g.user['is_admin'] %}<form method="post" action="{{ url_for('cancel_event', event_id=event['id']) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button button-danger">Cancel event</button></form>
+      {% elif joined %}<form method="post" action="{{ url_for('leave_event', event_id=event['id']) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button button-secondary">Leave event</button></form>
+      {% else %}<form method="post" action="{{ url_for('join_event', event_id=event['id']) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button button-primary" {{ 'disabled' if event['attendee_count']>=event['max_players'] }}>{{ 'Event full' if event['attendee_count']>=event['max_players'] else 'Reserve my spot' }}</button></form>{% endif %}
+      <a class="button button-secondary" href="{{ url_for('map_detail', map_id=event['map_id']) }}">Open map</a>
+    </div>
+  </div>
+  <div class="event-detail-layout">
+    <main><div class="section-heading"><div><span class="kicker-simple">ATTENDEES</span><h2>{{ event['attendee_count'] }}/{{ event['max_players'] }} players joined</h2></div></div><div class="attendee-grid">{% for user in attendees %}<a class="attendee-card" href="{{ url_for('public_profile', user_id=user['id']) if g.user else url_for('login') }}"><span class="avatar">{{ user['display_name'][0]|upper }}</span><span><strong>{{ user['display_name'] }}</strong><small>@{{ user['username'] }}{% if user['id']==event['host_id'] %} · Host{% endif %}</small></span></a>{% endfor %}</div></main>
+    <aside><div class="sidebar-card"><h3>Event details</h3><dl><div><dt>Map</dt><dd>{{ event['map_name'] }}</dd></div><div><dt>Map code</dt><dd><code>{{ event['map_code'] }}</code></dd></div><div><dt>Host</dt><dd>{{ event['host_name'] }}</dd></div><div><dt>Capacity</dt><dd>{{ event['max_players'] }} players</dd></div></dl></div><div class="sidebar-card safety-card"><h3>Before the event</h3><p>Join early, confirm the real in-game map code, and use the host's platform details to connect. Voice remains inside squad rooms.</p></div></aside>
+  </div>
+</section>
+{% endblock %}

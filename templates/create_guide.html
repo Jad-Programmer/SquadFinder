@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Write guide · MetaVerse SquadFinder{% endblock %}
+{% block content %}
+<section class="form-page shell narrow"><div class="form-intro"><span class="kicker-simple">COMMUNITY META</span><h1>Share a strategy for {{ map['name'] }}</h1><p>Useful guides should be specific, current, and easy to test during a real session.</p></div><form class="app-form simple-form" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Guide type<select name="guide_type"><option>Strategy</option><option>Meta</option><option>Beginner</option><option>Build</option><option>Route</option><option>Update</option></select></label><label>Title<input name="title" maxlength="100" required placeholder="What should players learn?"></label><label>Guide<textarea name="body" rows="9" maxlength="1200" required placeholder="Explain the roles, route, build, timing, or mechanic clearly..."></textarea></label><button class="button button-primary large-button">Publish guide</button></form></section>
+{% endblock %}

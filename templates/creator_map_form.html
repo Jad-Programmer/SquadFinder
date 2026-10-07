@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Add a real game map · MetaVerse SquadFinder{% endblock %}
+{% block content %}
+<section class="form-page shell narrow real-map-form-page">
+  <div class="form-intro">
+    <span class="kicker-simple">ADD A REAL GAME MAP</span>
+    <h1>Use the code from the game</h1>
+    <p>SquadFinder does not create the map inside Fortnite, Roblox, Minecraft, or another game. Publish the map in that game first, then paste the exact working code, ID, URL, or server address here.</p>
+    <div class="form-tip real-code-tip">
+      <strong>What happens next?</strong>
+      <span>1. Players discover the map in SquadFinder.</span>
+      <span>2. They copy your real in-game code.</span>
+      <span>3. They create squads, chat, and join voice.</span>
+    </div>
+  </div>
+
+  <form class="app-form simple-form" method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="real-map-notice">
+      <span class="real-map-notice-icon">#</span>
+      <div><strong>Only submit a published, working map</strong><p>Demo codes, made-up codes, and duplicate listings are rejected. New community submissions are not automatically marked verified.</p></div>
+    </div>
+
+    <div class="field-grid">
+      <label class="span-2">Game
+        <select name="platform" id="map-platform" required>
+          {% for item in platforms %}<option value="{{ item }}" {{ 'selected' if selected_platform == item }}>{{ item }}</option>{% endfor %}
+        </select>
+      </label>
+
+      <label class="span-2 real-code-field">Real map code / ID / URL / server address
+        <input name="map_code" id="real-map-code" value="{{ request.form.get('map_code','') }}" required maxlength="180" autocomplete="off" placeholder="Enter the exact reference shown in the game">
+        <small id="map-code-help">{{ map_reference_help.get(selected_platform, 'Enter the exact code or ID shown in the game.') }}</small>
+      </label>
+
+      <label class="span-2">Published map name
+        <input name="name" value="{{ request.form.get('name','') }}" required maxlength="100" placeholder="Use the same name players see in the game">
+      </label>
+
+      <label>Genre
+        <input name="genre" value="{{ request.form.get('genre','') }}" placeholder="Tycoon, PvP, Adventure..." maxlength="50">
+      </label>
+      <label>Difficulty
+        {% set current_difficulty = request.form.get('difficulty','Intermediate') %}
+        <select name="difficulty"><option {{ 'selected' if current_difficulty == 'Beginner' }}>Beginner</option><option {{ 'selected' if current_difficulty == 'Intermediate' }}>Intermediate</option><option {{ 'selected' if current_difficulty == 'Competitive' }}>Competitive</option><option {{ 'selected' if current_difficulty == 'Expert' }}>Expert</option></select>
+      </label>
+      <label>Maximum party
+        <input type="number" name="max_party" value="{{ request.form.get('max_party','4') }}" min="2" max="100">
+      </label>
+      <label>Typical session minutes
+        <input type="number" name="session_minutes" value="{{ request.form.get('session_minutes','20') }}" min="5" max="240">
+      </label>
+      <label class="span-2">Version / update label
+        <input name="version" value="{{ request.form.get('version','Launch') }}" maxlength="80" placeholder="Example: v1.2 or Season 3">
+      </label>
+      <label class="span-2">Description
+        <textarea name="description" rows="5" maxlength="1200" required placeholder="Explain the goal, game mode, and why players may need a squad.">{{ request.form.get('description','') }}</textarea>
+      </label>
+    </div>
+
+    <label class="real-code-confirm">
+      <input type="checkbox" name="confirm_real_code" value="yes" required {{ 'checked' if request.form.get('confirm_real_code') == 'yes' }}>
+      <span>I confirm this is the exact working map code, ID, URL, or server address shown in the selected game.</span>
+    </label>
+
+    <button class="button button-primary large-button">Add real map to SquadFinder</button>
+    <p class="submission-status-note">The listing will show a <strong>Community</strong> badge. A trusted platform integration or administrator can verify it later.</p>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(() => {
+  const platform = document.querySelector('#map-platform');
+  const help = document.querySelector('#map-code-help');
+  const input = document.querySelector('#real-map-code');
+  const hints = {{ map_reference_help|tojson }};
+  const placeholders = {
+    'Fortnite Creative': '1234-5678-9012',
+    'Roblox': 'https://www.roblox.com/games/1234567890/...',
+    'Minecraft': 'play.example-server.com:25565 or Realm code',
+    'GTA V FiveM': 'https://cfx.re/join/abc123',
+    'VRChat': 'wrld_...',
+    'Counter-Strike 2 Workshop': 'Steam Workshop ID or URL'
+  };
+  function updateReferenceHelp() {
+    const value = platform.value;
+    help.textContent = hints[value] || 'Enter the exact code or ID shown in the game.';
+    input.placeholder = placeholders[value] || 'Enter the exact reference shown in the game';
+  }
+  platform.addEventListener('change', updateReferenceHelp);
+  updateReferenceHelp();
+})();
+</script>
+{% endblock %}
