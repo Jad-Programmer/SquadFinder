@@ -1,1 +1,0 @@
-Supabase Postgres support; SQLite migration; Render free deployment; cloud HTTPS; no fake users/rooms/catalog by default; existing local mode preserved.
