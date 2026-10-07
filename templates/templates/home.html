@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% from '_components.html' import map_card, room_card %}
+{% block content %}
+<section class="hero shell">
+  <div class="hero-copy">
+    <div class="kicker"><span class="pulse-dot"></span> Live squads for UGC maps</div>
+    <h1>Find the map.<br><span>Build the squad.</span><br>Play now.</h1>
+    <p>Discover active maps across 12 creator-driven games—then match with players who want the same goal, region, language, and play style.</p>
+    <form class="hero-search" action="{{ url_for('maps_list') }}" method="get">
+      <span>⌕</span><input name="q" placeholder="Search a map name, code, genre..." autocomplete="off"><button>Explore maps</button>
+    </form>
+    <div class="hero-actions"><a class="button button-primary" href="{{ url_for('quick_match') }}">⚡ Quick match</a><a class="button button-secondary" href="{{ url_for('rooms_list') }}">Browse live squads</a><a class="button button-secondary" href="{{ url_for('creator_new_map') }}">+ Add real map</a></div>
+    <div class="hero-stats"><div><strong>{{ stats.games }}</strong><span>supported games</span></div><div><strong>{{ stats.maps }}</strong><span>tracked maps</span></div><div><strong>{{ stats.rooms }}</strong><span>live squads</span></div><div><strong>{{ stats.players }}</strong><span>players matching</span></div></div>
+  </div>
+  <div class="hero-stage">
+    <div class="orbital-ring ring-one"></div><div class="orbital-ring ring-two"></div>
+    <div class="stage-card stage-main">
+      <div class="stage-header"><span class="live-pill"><i></i> MATCH FOUND</span><span>12 sec</span></div>
+      <div class="stage-map"><div class="stage-icon">FN</div><div><small>FORTNITE CREATIVE</small><h3>Neon Heist</h3><code>4821-7390-1158</code></div></div>
+      <div class="stage-players"><span class="avatar large">N</span><span class="avatar large">L</span><span class="avatar large">K</span><span class="avatar large empty">+</span></div>
+      <div class="match-line"><span>Learning · Middle East · Arabic</span><strong>3/4</strong></div>
+      <div class="room-progress"><div style="width:75%"></div></div>
+    </div>
+    <div class="float-chip chip-one">⚡ 18 new rooms</div><div class="float-chip chip-two">🎮 Cross-platform</div><div class="float-chip chip-three">✓ Goal-based matching</div>
+  </div>
+</section>
+
+<section class="logo-strip"><span>Built for UGC communities</span>{% for game in games %}<a href="{{ url_for('maps_list', platform=game['platform']) }}"><strong>{{ platform_short.get(game['platform'], game['platform'][:2]|upper) }}</strong> {{ game['platform'] }}</a>{% endfor %}</section>
+
+<section class="section shell game-browser">
+  <div class="section-heading"><div><span class="kicker-simple">12 SUPPORTED GAMES</span><h2>Browse maps by game</h2></div><a class="text-link" href="{{ url_for('maps_list') }}">View the full catalog →</a></div>
+  <div class="game-grid">{% for game in games %}<a class="game-tile platform-{{ platform_slug(game['platform']) }}" href="{{ url_for('maps_list', platform=game['platform']) }}"><span class="game-symbol logo-badge"><img src="{{ url_for('static', filename='img/platform_logos/' ~ platform_slug(game['platform']) ~ '.svg') }}" alt="{{ game['platform'] }} logo"></span><span><strong>{{ game['platform'] }}</strong><small>{{ game['map_count'] }} maps · {{ game['active_players'] }} active</small></span><i>→</i></a>{% endfor %}</div>
+</section>
+
+<section class="section shell">
+  <div class="section-heading"><div><span class="kicker-simple">TRENDING NOW</span><h2>Maps players are forming squads for</h2></div><a class="text-link" href="{{ url_for('maps_list') }}">Explore all maps →</a></div>
+  <div class="map-grid expanded-grid">{% for map in trending %}{{ map_card(map) }}{% endfor %}</div>
+</section>
+
+<section class="section shell split-section">
+  <div class="section-heading"><div><span class="kicker-simple">LIVE LFG</span><h2>Squads filling right now</h2></div><a class="button button-secondary compact" href="{{ url_for('create_room') }}">+ Create room</a></div>
+  <div class="room-grid">{% for room in rooms %}{{ room_card(room) }}{% else %}<div class="empty-state">No active squads right now. Be the first to create one.</div>{% endfor %}</div>
+</section>
+
+<section class="section shell upcoming-events-home">
+  <div class="section-heading"><div><span class="kicker-simple">SCHEDULED PLAY</span><h2>Upcoming community events</h2></div><div class="heading-actions"><a class="button button-secondary compact" href="{{ url_for('events_list') }}">Browse events</a><a class="button button-primary compact" href="{{ url_for('create_event') }}">+ Schedule event</a></div></div>
+  <div class="home-event-grid">{% for event in upcoming_events %}<a class="home-event-card" href="{{ url_for('event_detail', event_id=event['id']) }}"><img src="{{ url_for('static', filename='img/platform_logos/' ~ platform_slug(event['platform']) ~ '.svg') }}" alt="{{ event['platform'] }} logo"><div><small>{{ event['starts_at']|eventtime }}</small><h3>{{ event['title'] }}</h3><p>{{ event['map_name'] }} · {{ event['attendee_count'] }}/{{ event['max_players'] }} joined</p></div><span>→</span></a>{% else %}<div class="empty-state"><h3>No scheduled events yet</h3><p>Create a future session so players can reserve a place.</p></div>{% endfor %}</div>
+</section>
+
+<section class="section shell how-it-works">
+  <div class="section-heading centered"><div><span class="kicker-simple">ONE MINUTE TO PLAY</span><h2>Less searching. More playing.</h2><p>Every part of SquadFinder is designed to get you from “I want to play this map” to a complete party.</p></div></div>
+  <div class="steps"><article><span>01</span><div class="step-icon">⌕</div><h3>Pick a map</h3><p>Search by name, code, platform, genre, or what is trending now.</p></article><article><span>02</span><div class="step-icon">⚙</div><h3>Set your goal</h3><p>Choose region, language, mic preference, style, role, and session length.</p></article><article><span>03</span><div class="step-icon">⚡</div><h3>Join the squad</h3><p>See the host’s platform handle, copy the map code, and connect in-game.</p></article></div>
+</section>
+
+<section class="cta shell"><div><span class="kicker-simple">YOUR NEXT RUN STARTS HERE</span><h2>Stop hunting through dead Discord channels.</h2><p>Join a live room or create the exact squad you need in seconds.</p></div><div><a class="button button-light" href="{{ url_for('register') }}">Create free account</a><a class="button button-ghost-light" href="{{ url_for('maps_list') }}">Explore maps</a></div></section>
+{% endblock %}
